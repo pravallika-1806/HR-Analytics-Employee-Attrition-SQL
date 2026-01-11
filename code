@@ -1,14 +1,6 @@
 CREATE DATABASE IF NOT EXISTS hr_analytics;
 USE hr_analytics;
 
-/* -----------------------------
-   2. Drop Table if Exists
------------------------------- */
-DROP TABLE IF EXISTS employee_attrition;
-
-/* -----------------------------
-   3. Create Table
------------------------------- */
 CREATE TABLE employee_attrition (
     EmployeeNumber INT PRIMARY KEY,
     Age INT,
@@ -22,10 +14,6 @@ CREATE TABLE employee_attrition (
     Attrition VARCHAR(5)
 );
 
-/* -----------------------------
-   4. Load Data from CSV
-   (Place CSV in MySQL Uploads folder)
------------------------------- */
 LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/employee_attrition.csv'
 INTO TABLE employee_attrition
 FIELDS TERMINATED BY ','
@@ -36,19 +24,10 @@ IGNORE 1 ROWS
  MonthlyIncome, YearsAtCompany, JobSatisfaction,
  PerformanceRating, Attrition);
 
-/* -----------------------------
-   5. Data Validation
------------------------------- */
 SELECT COUNT(*) AS total_records FROM employee_attrition;
 SELECT * FROM employee_attrition LIMIT 10;
 
-/* =========================================================
-   BUSINESS ANALYSIS QUERIES
-   ========================================================= */
 
-/* -----------------------------
-   6. Overall Attrition Rate
------------------------------- */
 SELECT 
     COUNT(*) AS total_employees,
     SUM(CASE WHEN Attrition = 'Yes' THEN 1 ELSE 0 END) AS attrition_count,
@@ -58,9 +37,6 @@ SELECT
     ) AS attrition_rate_percentage
 FROM employee_attrition;
 
-/* -----------------------------
-   7. Attrition by Department
------------------------------- */
 SELECT 
     Department,
     COUNT(*) AS total_employees,
@@ -69,9 +45,7 @@ FROM employee_attrition
 GROUP BY Department
 ORDER BY attrition_count DESC;
 
-/* -----------------------------
-   8. Attrition by Job Role
------------------------------- */
+
 SELECT 
     JobRole,
     COUNT(*) AS total_employees,
@@ -80,18 +54,12 @@ FROM employee_attrition
 GROUP BY JobRole
 ORDER BY attrition_count DESC;
 
-/* -----------------------------
-   9. Salary Comparison
------------------------------- */
 SELECT 
     Attrition,
     ROUND(AVG(MonthlyIncome), 2) AS avg_monthly_income
 FROM employee_attrition
 GROUP BY Attrition;
 
-/* -----------------------------
-   10. Experience-based Attrition
------------------------------- */
 SELECT 
     YearsAtCompany,
     COUNT(*) AS total_employees,
@@ -100,9 +68,6 @@ FROM employee_attrition
 GROUP BY YearsAtCompany
 ORDER BY YearsAtCompany;
 
-/* -----------------------------
-   11. Job Satisfaction vs Attrition
------------------------------- */
 SELECT 
     JobSatisfaction,
     COUNT(*) AS total_employees,
@@ -111,9 +76,6 @@ FROM employee_attrition
 GROUP BY JobSatisfaction
 ORDER BY JobSatisfaction;
 
-/* -----------------------------
-   12. Gender-wise Attrition
------------------------------- */
 SELECT 
     Gender,
     COUNT(*) AS total_employees,
@@ -121,9 +83,7 @@ SELECT
 FROM employee_attrition
 GROUP BY Gender;
 
-/* -----------------------------
-   13. High-Risk Employees Identification
------------------------------- */
+
 SELECT 
     EmployeeNumber,
     Department,
@@ -136,10 +96,6 @@ WHERE Attrition = 'Yes'
   AND JobSatisfaction <= 2
   AND YearsAtCompany <= 3;
 
-/* -----------------------------
-   14. Rank Departments by Attrition
-   (Window Function)
------------------------------- */
 SELECT 
     Department,
     COUNT(*) AS attrition_count,
@@ -148,6 +104,3 @@ FROM employee_attrition
 WHERE Attrition = 'Yes'
 GROUP BY Department;
 
-/* =========================================================
-   END OF PROJECT
-   ========================================================= */
